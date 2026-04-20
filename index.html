@@ -13,6 +13,1310 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
+      --page-bg: #060816;
+      --page-bg-2: #11162a;
+      --page-bg-3: #1a1630;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-2: rgba(30, 41, 59, 0.75);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --ready: #10b981;
+      --waiting: #f59e0b;
+      --results: #3b82f6;
+      --error: #ef4444;
+      --border: rgba(148, 163, 184, 0.18);
+      --shadow: 0 24px 80px rgba(2, 6, 23, 0.45);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --transition: 180ms ease;
+      --stage-glow: rgba(59, 130, 246, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(168, 85, 247, 0.10), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.08), transparent 28%),
+        linear-gradient(135deg, var(--page-bg) 0%, var(--page-bg-2) 48%, var(--page-bg-3) 100%);
+      color: var(--text);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      padding: clamp(16px, 2vw, 28px);
+    }
+
+    button, input, textarea {
+      font: inherit;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: end;
+      justify-content: flex-start;
+      padding: 10px 2px 2px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.55);
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 12px;
+      backdrop-filter: blur(12px);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--results), var(--ready));
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.65);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Outfit", "Inter", system-ui, sans-serif;
+      font-size: clamp(2.4rem, 5vw, 4.7rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      max-width: 8ch;
+    }
+
+    .lead {
+      margin: 12px 0 0;
+      max-width: 62ch;
+      color: var(--text-muted);
+      line-height: 1.65;
+      font-size: 1.02rem;
+    }
+
+    .stat-card,
+    .info-card,
+    .history-card {
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label,
+    .info-title,
+    .history-title,
+    .hint-label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+    }
+
+    .stat-value {
+      display: block;
+      margin-top: 8px;
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.85fr);
+      gap: 18px;
+    }
+
+    .stage-shell {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.92));
+      min-height: 620px;
+      box-shadow: var(--shadow);
+      isolation: isolate;
+    }
+
+    .stage-shell::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: radial-gradient(circle at 50% 25%, var(--stage-glow), transparent 40%);
+      opacity: 1;
+      z-index: 0;
+      transition: opacity 220ms ease;
+      pointer-events: none;
+    }
+
+    .stage {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 620px;
+      padding: clamp(18px, 2vw, 26px);
+      cursor: pointer;
+      outline: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .stage-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 600;
+      min-height: 44px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--results);
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.7);
+      transition: background var(--transition), box-shadow var(--transition);
+      flex-shrink: 0;
+    }
+
+    .stage-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    #three-container {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.98;
+    }
+
+    .overlay {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      gap: 18px;
+      padding: 36px 18px 28px;
+    }
+
+    .display-label {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .display-value {
+      margin: 0;
+      font-size: clamp(3.5rem, 11vw, 7rem);
+      line-height: 0.88;
+      letter-spacing: -0.06em;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 32px rgba(15, 23, 42, 0.55);
+    }
+
+    .display-subtext {
+      margin: 0;
+      max-width: 36ch;
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    .controls {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      border: 1px solid transparent;
+      border-radius: 16px;
+      padding: 14px 18px;
+      min-height: 50px;
+      min-width: 130px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--transition), background var(--transition), border-color var(--transition), opacity var(--transition);
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.96), rgba(37, 99, 235, 0.94));
+      color: white;
+      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.28);
+    }
+
+    .button-secondary {
+      background: rgba(148, 163, 184, 0.08);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .button-danger {
+      background: rgba(239, 68, 68, 0.12);
+      color: #fecaca;
+      border-color: rgba(239, 68, 68, 0.28);
+    }
+
+    .button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .quick-note {
+      color: var(--text-muted);
+      font-size: 0.93rem;
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat-card,
+    .info-card,
+    .history-card {
+      padding: 18px;
+    }
+
+    .stat-card {
+      min-height: 108px;
+    }
+
+    .info-card h2,
+    .history-card h2 {
+      margin: 0 0 14px;
+      font-family: "Outfit", "Inter", system-ui, sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .info-list {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 12px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .history-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.42);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      color: var(--text);
+    }
+
+    .history-item small {
+      color: var(--text-muted);
+      display: block;
+      margin-top: 4px;
+    }
+
+    .history-time {
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      font-size: 1.02rem;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      padding: 2px 0 10px;
+    }
+
+    .state-idle .status-dot,
+    .state-result .status-dot { background: var(--results); box-shadow: 0 0 18px rgba(59, 130, 246, 0.72); }
+    .state-waiting .status-dot { background: var(--waiting); box-shadow: 0 0 18px rgba(245, 158, 11, 0.72); }
+    .state-ready .status-dot { background: var(--ready); box-shadow: 0 0 18px rgba(16, 185, 129, 0.78); }
+    .state-false-start .status-dot,
+    .state-error .status-dot { background: var(--error); box-shadow: 0 0 18px rgba(239, 68, 68, 0.72); }
+
+    .state-idle { --accent: var(--results); --stage-glow: rgba(59, 130, 246, 0.24); }
+    .state-waiting { --accent: var(--waiting); --stage-glow: rgba(245, 158, 11, 0.26); }
+    .state-ready { --accent: var(--ready); --stage-glow: rgba(16, 185, 129, 0.28); }
+    .state-result { --accent: var(--results); --stage-glow: rgba(59, 130, 246, 0.24); }
+    .state-false-start,
+    .state-error { --accent: var(--error); --stage-glow: rgba(239, 68, 68, 0.24); }
+
+    .state-ready .display-value,
+    .state-ready .status-chip strong { color: var(--ready); }
+    .state-waiting .display-value,
+    .state-waiting .status-chip strong { color: var(--waiting); }
+    .state-result .display-value,
+    .state-result .status-chip strong { color: var(--results); }
+    .state-false-start .display-value,
+    .state-false-start .status-chip strong,
+    .state-error .display-value,
+    .state-error .status-chip strong { color: var(--error); }
+
+    .state-ready .stage-shell,
+    .state-waiting .stage-shell,
+    .state-result .stage-shell,
+    .state-false-start .stage-shell,
+    .state-error .stage-shell {
+      border-color: color-mix(in srgb, var(--accent) 28%, rgba(148, 163, 184, 0.18));
+    }
+
+    .empty-history {
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-shell,
+      .stage {
+        min-height: 560px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-shell,
+      .stage {
+        min-height: 520px;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .button-group {
+        width: 100%;
+      }
+
+      .button {
+        flex: 1 1 0;
+      }
+
+      .stage-top {
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body class="state-idle">
+  <main class="app">
+    <section class="hero">
+      <div>
+        <span class="eyebrow">Portfolio-ready Three.js timing game</span>
+        <h1>Reaction Forge</h1>
+        <p class="lead">
+          A polished reaction timer that blends precise millisecond measurement with responsive gameplay,
+          animated 3D visuals, and clear session analytics.
+        </p>
+      </div>
+
+    </section>
+
+    <section class="layout">
+      <div class="stage-shell" id="stage-shell">
+        <div id="three-container" aria-hidden="true"></div>
+
+        <section
+          class="stage"
+          id="stage"
+          tabindex="0"
+          aria-label="Reaction game stage"
+          aria-describedby="instructions"
+        >
+          <div class="stage-top">
+            <div class="status-chip" aria-live="polite">
+              <span class="status-dot"></span>
+              <strong id="status-text">Idle</strong>
+            </div>
+            <div class="stage-hint">
+              <span class="hint-label">Input</span>
+              <span>Tap the stage or press <strong>Space</strong> when green</span>
+            </div>
+          </div>
+
+          <div class="overlay">
+            <span class="display-label" id="display-label">Reaction Timer</span>
+            <p class="display-value" id="display-value" aria-live="polite">Ready?</p>
+            <p class="display-subtext" id="instructions">
+              Press <strong>Start</strong>. Wait for the scene to turn green, then react as fast as you can.
+              Clicking too early triggers a false start.
+            </p>
+          </div>
+
+          <div class="controls">
+            <div class="button-group">
+              <button class="button button-primary" id="start-btn" type="button">Start</button>
+              <button class="button button-secondary" id="stop-btn" type="button" disabled>Stop</button>
+              <button class="button button-danger" id="reset-btn" type="button">Reset</button>
+            </div>
+            <div class="quick-note" id="session-note">No attempts yet. Your stats will appear here after the first valid reaction.</div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sidebar">
+        <section class="stats" aria-label="Session statistics">
+          <article class="stat-card">
+            <span class="stat-label">Best</span>
+            <strong class="stat-value" id="best-stat">—</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Average</span>
+            <strong class="stat-value" id="avg-stat">—</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Attempts</span>
+            <strong class="stat-value" id="count-stat">0</strong>
+          </article>
+        </section>
+
+        <section class="info-card">
+          <h2>How it works</h2>
+          <ul class="info-list">
+            <li>The delay before the stimulus is randomized between 1 and 5 seconds.</li>
+            <li>Timing is measured with <code>performance.now()</code> for millisecond precision.</li>
+            <li>The 3D scene shifts color, motion, and intensity to signal each gameplay state.</li>
+            <li>False starts are detected immediately and do not affect your best or average time.</li>
+          </ul>
+        </section>
+
+        <section class="history-card" aria-live="polite">
+          <h2>Recent attempts</h2>
+          <div id="history-list">
+            <p class="empty-history">No reaction times recorded yet.</p>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <p class="footer-note">Built as a single static HTML file with vanilla JavaScript and a live Three.js scene.</p>
+    <p class="sr-only" id="live-region" aria-live="assertive"></p>
+  </main>
+
+  <script src="https://unpkg.com/three@0.164.1/build/three.min.js"></script>
+  <script>
+    (() => {
+      'use strict';
+
+      const GAME_STATES = Object.freeze({
+        IDLE: 'idle',
+        WAITING: 'waiting',
+        READY: 'ready',
+        RESULT: 'result',
+        FALSE_START: 'false-start',
+        ERROR: 'error'
+      });
+
+      const COLORS = Object.freeze({
+        idle: 0x3b82f6,
+        waiting: 0xf59e0b,
+        ready: 0x10b981,
+        result: 0x3b82f6,
+        error: 0xef4444,
+        neutral: 0xe2e8f0,
+        background: 0x0f172a
+      });
+
+      const body = document.body;
+      const stage = document.getElementById('stage');
+      const stageShell = document.getElementById('stage-shell');
+      const startButton = document.getElementById('start-btn');
+      const stopButton = document.getElementById('stop-btn');
+      const resetButton = document.getElementById('reset-btn');
+      const statusText = document.getElementById('status-text');
+      const displayLabel = document.getElementById('display-label');
+      const displayValue = document.getElementById('display-value');
+      const instructions = document.getElementById('instructions');
+      const sessionNote = document.getElementById('session-note');
+      const liveRegion = document.getElementById('live-region');
+      const bestStat = document.getElementById('best-stat');
+      const avgStat = document.getElementById('avg-stat');
+      const countStat = document.getElementById('count-stat');
+      const historyList = document.getElementById('history-list');
+      const threeContainer = document.getElementById('three-container');
+
+      let gameState = GAME_STATES.IDLE;
+      let stimulusTimeoutId = null;
+      let reactionStartTime = 0;
+      let attemptIndex = 0;
+      let results = [];
+      let recentResults = [];
+      let feedbackHoldTimeoutId = null;
+
+      let renderer = null;
+      let scene = null;
+      let camera = null;
+      let animationFrameId = null;
+      let resizeObserver = null;
+      let sceneObjects = null;
+      let lastFrameTime = 0;
+      let sceneEnabled = false;
+      let sphereTargetX = 0;
+      let sphereTargetY = 0;
+      let sphereDrift = 0;
+
+      function safeNumber(value) {
+        return Number.isFinite(value) ? value : 0;
+      }
+
+      function formatMilliseconds(value) {
+        return `${Math.round(value)} ms`;
+      }
+
+      function average(values) {
+        if (!Array.isArray(values) || values.length === 0) return null;
+        const total = values.reduce((sum, item) => sum + item, 0);
+        return total / values.length;
+      }
+
+      function best(values) {
+        if (!Array.isArray(values) || values.length === 0) return null;
+        return Math.min(...values);
+      }
+
+      function clearPendingTimers() {
+        if (stimulusTimeoutId !== null) {
+          clearTimeout(stimulusTimeoutId);
+          stimulusTimeoutId = null;
+        }
+        if (feedbackHoldTimeoutId !== null) {
+          clearTimeout(feedbackHoldTimeoutId);
+          feedbackHoldTimeoutId = null;
+        }
+      }
+
+      function setLiveMessage(message) {
+        liveRegion.textContent = '';
+        window.setTimeout(() => {
+          liveRegion.textContent = message;
+        }, 12);
+      }
+
+      function setGameState(nextState) {
+        gameState = nextState;
+        body.classList.remove(
+          'state-idle',
+          'state-waiting',
+          'state-ready',
+          'state-result',
+          'state-false-start',
+          'state-error'
+        );
+
+        const normalizedState = nextState === GAME_STATES.FALSE_START ? 'false-start' : nextState;
+        body.classList.add(`state-${normalizedState}`);
+
+        switch (nextState) {
+          case GAME_STATES.IDLE:
+            statusText.textContent = 'Idle';
+            displayLabel.textContent = 'Reaction Timer';
+            displayValue.textContent = 'Ready?';
+            instructions.innerHTML = 'Press <strong>Start</strong>. Wait for the scene to turn green, then react as fast as you can. Clicking too early triggers a false start.';
+            startButton.textContent = results.length > 0 ? 'Start Next Round' : 'Start';
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            setLiveMessage('Game is idle. Press start when ready.');
+            break;
+          case GAME_STATES.WAITING:
+            statusText.textContent = 'Waiting';
+            displayLabel.textContent = 'Hold steady';
+            displayValue.textContent = 'Wait...';
+            instructions.innerHTML = 'Do <strong>not</strong> react yet. Watch the scene and wait for the green signal.';
+            startButton.textContent = 'Running';
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            setLiveMessage('Game started. Wait for the green signal.');
+            break;
+          case GAME_STATES.READY:
+            statusText.textContent = 'React now';
+            displayLabel.textContent = 'Stimulus active';
+            displayValue.textContent = 'GO!';
+            instructions.innerHTML = 'Tap the stage or press <strong>Space</strong> now.';
+            startButton.textContent = 'Running';
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            setLiveMessage('Go now. React as fast as you can.');
+            break;
+          case GAME_STATES.RESULT:
+            statusText.textContent = 'Result';
+            displayLabel.textContent = 'Reaction time';
+            startButton.textContent = 'Start Next Round';
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            break;
+          case GAME_STATES.FALSE_START:
+            statusText.textContent = 'False start';
+            displayLabel.textContent = 'Too early';
+            startButton.textContent = 'Try Again';
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            setLiveMessage('False start. You reacted too early.');
+            break;
+          case GAME_STATES.ERROR:
+            statusText.textContent = 'Error';
+            displayLabel.textContent = 'Problem detected';
+            startButton.textContent = 'Retry';
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            break;
+          default:
+            break;
+        }
+      }
+
+      function updateStats() {
+        const bestTime = best(results);
+        const avgTime = average(results);
+        bestStat.textContent = bestTime === null ? '—' : formatMilliseconds(bestTime);
+        avgStat.textContent = avgTime === null ? '—' : formatMilliseconds(avgTime);
+        countStat.textContent = String(results.length);
+
+        if (results.length === 0) {
+          sessionNote.textContent = 'No attempts yet. Your stats will appear here after the first valid reaction.';
+          return;
+        }
+
+        const noteParts = [
+          `Best: ${formatMilliseconds(bestTime)}`,
+          `Average: ${formatMilliseconds(avgTime)}`,
+          `${results.length} valid ${results.length === 1 ? 'attempt' : 'attempts'}`
+        ];
+        sessionNote.textContent = noteParts.join(' • ');
+      }
+
+      function updateHistory() {
+        if (recentResults.length === 0) {
+          historyList.innerHTML = '<p class="empty-history">No reaction times recorded yet.</p>';
+          return;
+        }
+
+        const markup = recentResults
+          .slice()
+          .reverse()
+          .map((item) => `
+            <li class="history-item">
+              <div>
+                <strong>Attempt ${item.attempt}</strong>
+                <small>${item.note}</small>
+              </div>
+              <span class="history-time">${formatMilliseconds(item.time)}</span>
+            </li>
+          `)
+          .join('');
+
+        historyList.innerHTML = `<ul class="history-list">${markup}</ul>`;
+      }
+
+      function resetDisplayToIdle() {
+        setGameState(GAME_STATES.IDLE);
+      }
+
+      function stopCurrentRound(options = {}) {
+        const { keepMessage = false } = options;
+        clearPendingTimers();
+        reactionStartTime = 0;
+        if (!keepMessage) {
+          resetDisplayToIdle();
+        } else {
+          startButton.disabled = false;
+          stopButton.disabled = true;
+        }
+      }
+
+      function scheduleStimulus() {
+        try {
+          const delay = Math.floor(Math.random() * 4001) + 1000;
+          stimulusTimeoutId = window.setTimeout(() => {
+            stimulusTimeoutId = null;
+            reactionStartTime = performance.now();
+            setGameState(GAME_STATES.READY);
+          }, delay);
+        } catch (error) {
+          handleError('Unable to schedule the next stimulus.', error);
+        }
+      }
+
+      function startRound() {
+        try {
+          clearPendingTimers();
+          reactionStartTime = 0;
+          setGameState(GAME_STATES.WAITING);
+          scheduleStimulus();
+          stage.focus({ preventScroll: true });
+        } catch (error) {
+          handleError('Unable to start the game.', error);
+        }
+      }
+
+      function handleFalseStart() {
+        stopCurrentRound({ keepMessage: true });
+        setGameState(GAME_STATES.FALSE_START);
+        displayValue.textContent = 'Too Soon';
+        instructions.innerHTML = 'You reacted before the signal turned green. Press <strong>Try Again</strong> to restart the round.';
+      }
+
+      function recordReaction() {
+        try {
+          if (reactionStartTime === 0) {
+            handleError('Timing reference was missing for this round. Please restart.', null);
+            return;
+          }
+
+          const elapsed = performance.now() - reactionStartTime;
+          const reactionTime = Math.max(0, Math.round(elapsed));
+          attemptIndex += 1;
+          results.push(reactionTime);
+          recentResults.push({
+            attempt: attemptIndex,
+            time: reactionTime,
+            note: reactionTime < 220 ? 'Excellent reflexes' : reactionTime < 300 ? 'Strong response' : reactionTime < 380 ? 'Solid timing' : 'Room to improve'
+          });
+          recentResults = recentResults.slice(-5);
+
+          stopCurrentRound({ keepMessage: true });
+          setGameState(GAME_STATES.RESULT);
+          displayValue.textContent = formatMilliseconds(reactionTime);
+          instructions.innerHTML = `Attempt <strong>${attemptIndex}</strong> recorded. Press <strong>Start Next Round</strong> to go again.`;
+          updateStats();
+          updateHistory();
+          setLiveMessage(`Reaction time recorded: ${reactionTime} milliseconds.`);
+        } catch (error) {
+          handleError('Unable to record the reaction time.', error);
+        }
+      }
+
+      function handleStageAction() {
+        if (gameState === GAME_STATES.WAITING) {
+          handleFalseStart();
+          return;
+        }
+
+        if (gameState === GAME_STATES.READY) {
+          recordReaction();
+        }
+      }
+
+      function moveSphereToPointer(event) {
+        if (!sceneEnabled || !sceneObjects || !event) return;
+
+        const bounds = stageShell.getBoundingClientRect();
+        if (!bounds.width || !bounds.height) return;
+
+        const normalizedX = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+        const normalizedY = -((((event.clientY - bounds.top) / bounds.height) * 2) - 1);
+
+        sphereTargetX = Math.max(-1.35, Math.min(1.35, normalizedX * 1.35));
+        sphereTargetY = Math.max(-0.95, Math.min(0.95, normalizedY * 0.95));
+        sphereDrift = 1;
+      }
+
+      function resetSession() {
+        stopCurrentRound();
+        results = [];
+        recentResults = [];
+        attemptIndex = 0;
+        sphereTargetX = 0;
+        sphereTargetY = 0;
+        sphereDrift = 0;
+        if (sceneObjects && sceneObjects.currentOffset) {
+          sceneObjects.currentOffset.set(0, 0, 0);
+        }
+        updateStats();
+        updateHistory();
+        stage.focus({ preventScroll: true });
+      }
+
+      function handleError(message, error) {
+        console.error(message, error);
+        stopCurrentRound({ keepMessage: true });
+        setGameState(GAME_STATES.ERROR);
+        displayValue.textContent = 'Error';
+        instructions.textContent = `${message} Use Reset and try again.`;
+        setLiveMessage(message);
+      }
+
+      function attachEvents() {
+        startButton.addEventListener('click', startRound);
+        stopButton.addEventListener('click', () => {
+          stopCurrentRound();
+          stage.focus({ preventScroll: true });
+        });
+        resetButton.addEventListener('click', resetSession);
+
+        stage.addEventListener('click', (event) => {
+          if (event.target.closest('button')) return;
+          moveSphereToPointer(event);
+          handleStageAction();
+        });
+
+        stage.addEventListener('keydown', (event) => {
+          const code = event.code || event.key;
+          if (code === 'Space' || code === ' ') {
+            event.preventDefault();
+            handleStageAction();
+          }
+        });
+
+        window.addEventListener('keydown', (event) => {
+          const code = event.code || event.key;
+          const tag = document.activeElement ? document.activeElement.tagName : '';
+          const isTyping = /INPUT|TEXTAREA|SELECT/.test(tag);
+          if (isTyping) return;
+
+          if (code === 'Enter' && !startButton.disabled) {
+            event.preventDefault();
+            startRound();
+            return;
+          }
+
+          if (code === 'Escape' && !stopButton.disabled) {
+            event.preventDefault();
+            stopCurrentRound();
+            return;
+          }
+
+          if (code === 'Space' || code === ' ') {
+            if (document.activeElement !== stage) {
+              event.preventDefault();
+              handleStageAction();
+            }
+          }
+        });
+      }
+
+      function initThreeScene() {
+        if (!window.THREE) {
+          sessionNote.textContent = 'Three.js could not be loaded, so the game is running in fallback mode without the 3D scene.';
+          return;
+        }
+
+        try {
+          const { THREE } = window;
+          scene = new THREE.Scene();
+          scene.fog = new THREE.Fog(COLORS.background, 7.5, 15);
+
+          camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+          camera.position.set(0, 0.35, 7.25);
+
+          renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8));
+          renderer.outputColorSpace = THREE.SRGBColorSpace;
+          renderer.toneMapping = THREE.ACESFilmicToneMapping;
+          renderer.toneMappingExposure = 1.1;
+          threeContainer.appendChild(renderer.domElement);
+
+          const ambientLight = new THREE.AmbientLight(0xffffff, 1.15);
+          const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
+          keyLight.position.set(3.5, 4, 5.5);
+          const rimLight = new THREE.PointLight(0x60a5fa, 22, 30, 2.2);
+          rimLight.position.set(-2.5, 1.2, 3.4);
+
+          scene.add(ambientLight, keyLight, rimLight);
+
+          const root = new THREE.Group();
+          scene.add(root);
+
+          const mainGeometry = new THREE.SphereGeometry(1.12, 56, 56);
+          const coreGeometry = new THREE.SphereGeometry(1.42, 28, 28);
+          const orbitGeometry = new THREE.TorusGeometry(2.15, 0.04, 16, 120);
+
+          const mainMaterial = new THREE.MeshPhysicalMaterial({
+            color: COLORS.idle,
+            emissive: COLORS.idle,
+            emissiveIntensity: 0.24,
+            metalness: 0.08,
+            roughness: 0.18,
+            clearcoat: 1,
+            clearcoatRoughness: 0.18,
+            transmission: 0.02
+          });
+
+          const coreMaterial = new THREE.MeshStandardMaterial({
+            color: 0xe2e8f0,
+            emissive: 0x1d4ed8,
+            emissiveIntensity: 0.12,
+            metalness: 0.08,
+            roughness: 0.34,
+            transparent: true,
+            opacity: 0.14,
+            wireframe: true
+          });
+
+          const orbitMaterial = new THREE.MeshBasicMaterial({
+            color: COLORS.idle,
+            transparent: true,
+            opacity: 0.28
+          });
+
+          const mainMesh = new THREE.Mesh(mainGeometry, mainMaterial);
+          const coreMesh = new THREE.Mesh(coreGeometry, coreMaterial);
+          const orbitMeshA = new THREE.Mesh(orbitGeometry, orbitMaterial);
+          const orbitMeshB = new THREE.Mesh(orbitGeometry, orbitMaterial.clone());
+          orbitMeshB.rotation.x = Math.PI / 2;
+          orbitMeshA.rotation.y = Math.PI / 6;
+
+          root.add(mainMesh, coreMesh, orbitMeshA, orbitMeshB);
+
+          const sparkGeometry = new THREE.SphereGeometry(0.08, 16, 16);
+          const sparkMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.65 });
+          const sparks = [];
+
+          for (let i = 0; i < 14; i += 1) {
+            const spark = new THREE.Mesh(sparkGeometry, sparkMaterial.clone());
+            const angle = (Math.PI * 2 * i) / 14;
+            const radius = 2.55 + (i % 2) * 0.18;
+            spark.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius * 0.55, (i % 3 - 1) * 0.45);
+            spark.scale.setScalar(0.75 + (i % 4) * 0.08);
+            root.add(spark);
+            sparks.push(spark);
+          }
+
+          sceneObjects = {
+            root,
+            mainMesh,
+            coreMesh,
+            orbitMeshA,
+            orbitMeshB,
+            orbitMaterialA: orbitMeshA.material,
+            orbitMaterialB: orbitMeshB.material,
+            rimLight,
+            sparks,
+            currentOffset: new THREE.Vector3(0, 0, 0),
+            disposables: [mainGeometry, coreGeometry, orbitGeometry, sparkGeometry, mainMaterial, coreMaterial, orbitMeshA.material, orbitMeshB.material, sparkMaterial]
+          };
+
+          const resize = () => {
+            if (!renderer || !camera) return;
+            const bounds = stageShell.getBoundingClientRect();
+            const width = Math.max(320, Math.floor(bounds.width));
+            const height = Math.max(420, Math.floor(bounds.height));
+            renderer.setSize(width, height, false);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+          };
+
+          resize();
+
+          if ('ResizeObserver' in window) {
+            resizeObserver = new ResizeObserver(resize);
+            resizeObserver.observe(stageShell);
+          } else {
+            window.addEventListener('resize', resize);
+          }
+
+          sceneEnabled = true;
+          animateScene(0);
+        } catch (error) {
+          console.error('Three.js scene failed to initialize.', error);
+          sessionNote.textContent = 'The 3D scene could not initialize, but the game still works in fallback mode.';
+          sceneEnabled = false;
+        }
+      }
+
+      function getSceneProfile() {
+        switch (gameState) {
+          case GAME_STATES.WAITING:
+            return {
+              color: COLORS.waiting,
+              emissiveIntensity: 0.20,
+              rimColor: COLORS.waiting,
+              rimPower: 20,
+              spin: 0.45,
+              wobble: 0.08,
+              scale: 1,
+              sparkScale: 0.82,
+              sparkPulse: 0.18,
+              clickResponse: 0.12
+            };
+          case GAME_STATES.READY:
+            return {
+              color: COLORS.ready,
+              emissiveIntensity: 0.60,
+              rimColor: COLORS.ready,
+              rimPower: 28,
+              spin: 1.2,
+              wobble: 0.22,
+              scale: 1.08,
+              sparkScale: 1.15,
+              sparkPulse: 0.40,
+              clickResponse: 0.18
+            };
+          case GAME_STATES.RESULT:
+            return {
+              color: COLORS.result,
+              emissiveIntensity: 0.32,
+              rimColor: COLORS.result,
+              rimPower: 24,
+              spin: 0.72,
+              wobble: 0.14,
+              scale: 1.03,
+              sparkScale: 0.98,
+              sparkPulse: 0.25,
+              clickResponse: 0.14
+            };
+          case GAME_STATES.FALSE_START:
+          case GAME_STATES.ERROR:
+            return {
+              color: COLORS.error,
+              emissiveIntensity: 0.52,
+              rimColor: COLORS.error,
+              rimPower: 26,
+              spin: 1.35,
+              wobble: 0.28,
+              scale: 0.94,
+              sparkScale: 1.04,
+              sparkPulse: 0.36,
+              clickResponse: 0.20
+            };
+          case GAME_STATES.IDLE:
+          default:
+            return {
+              color: COLORS.idle,
+              emissiveIntensity: 0.22,
+              rimColor: COLORS.idle,
+              rimPower: 18,
+              spin: 0.56,
+              wobble: 0.10,
+              scale: 1,
+              sparkScale: 0.88,
+              sparkPulse: 0.14,
+              clickResponse: 0.10
+            };
+        }
+      }
+
+      function animateScene(timestamp) {
+        if (!sceneEnabled || !renderer || !scene || !camera || !sceneObjects) return;
+
+        animationFrameId = window.requestAnimationFrame(animateScene);
+        const elapsedSeconds = timestamp * 0.001;
+        const deltaSeconds = lastFrameTime ? (timestamp - lastFrameTime) * 0.001 : 0.016;
+        lastFrameTime = timestamp;
+
+        const profile = getSceneProfile();
+        const pulse = (Math.sin(elapsedSeconds * 2.8) + 1) * 0.5;
+        const pulseFast = (Math.sin(elapsedSeconds * 8.5) + 1) * 0.5;
+        const accent = new THREE.Color(profile.color);
+        const rim = new THREE.Color(profile.rimColor);
+
+        sphereDrift *= 0.94;
+        sphereTargetX *= 0.985;
+        sphereTargetY *= 0.985;
+
+        const movementStrength = 0.10 + profile.clickResponse + sphereDrift * 0.07;
+        sceneObjects.currentOffset.x += (sphereTargetX - sceneObjects.currentOffset.x) * movementStrength;
+        sceneObjects.currentOffset.y += (sphereTargetY - sceneObjects.currentOffset.y) * movementStrength;
+
+        sceneObjects.mainMesh.rotation.y += deltaSeconds * profile.spin * 0.72;
+        sceneObjects.mainMesh.rotation.x += deltaSeconds * profile.spin * 0.16;
+        sceneObjects.coreMesh.rotation.x -= deltaSeconds * (profile.spin * 0.22 + 0.08);
+        sceneObjects.coreMesh.rotation.y += deltaSeconds * (profile.spin * 0.30 + 0.1);
+        sceneObjects.root.rotation.y += deltaSeconds * 0.10;
+        sceneObjects.root.position.x = sceneObjects.currentOffset.x;
+        sceneObjects.root.position.y = Math.sin(elapsedSeconds * 1.8) * profile.wobble + sceneObjects.currentOffset.y;
+
+        const targetScale = profile.scale + pulse * 0.04 + (gameState === GAME_STATES.READY ? pulseFast * 0.02 : 0) + sphereDrift * 0.02;
+        sceneObjects.root.scale.setScalar(targetScale);
+
+        sceneObjects.mainMesh.material.color.lerp(accent, 0.08);
+        sceneObjects.mainMesh.material.emissive.lerp(accent, 0.08);
+        sceneObjects.mainMesh.material.emissiveIntensity += (profile.emissiveIntensity - sceneObjects.mainMesh.material.emissiveIntensity) * 0.08;
+
+        sceneObjects.orbitMaterialA.color.lerp(accent, 0.10);
+        sceneObjects.orbitMaterialB.color.lerp(accent, 0.10);
+        sceneObjects.orbitMaterialA.opacity += ((0.18 + pulse * 0.24) - sceneObjects.orbitMaterialA.opacity) * 0.08;
+        sceneObjects.orbitMaterialB.opacity += ((0.12 + pulseFast * 0.20) - sceneObjects.orbitMaterialB.opacity) * 0.08;
+
+        sceneObjects.orbitMeshA.rotation.z += deltaSeconds * (profile.spin * 0.45);
+        sceneObjects.orbitMeshA.rotation.x += deltaSeconds * 0.06;
+        sceneObjects.orbitMeshB.rotation.y -= deltaSeconds * (profile.spin * 0.5);
+        sceneObjects.orbitMeshB.rotation.x += deltaSeconds * (profile.spin * 0.24);
+
+        sceneObjects.coreMesh.material.emissive.lerp(rim, 0.08);
+        sceneObjects.rimLight.color.lerp(rim, 0.08);
+        sceneObjects.rimLight.intensity += (profile.rimPower - sceneObjects.rimLight.intensity) * 0.08;
+
+        sceneObjects.sparks.forEach((spark, index) => {
+          const offset = elapsedSeconds * (1.4 + index * 0.05);
+          const angle = offset + (Math.PI * 2 * index) / sceneObjects.sparks.length;
+          const radius = 2.55 + Math.sin(offset * 2.1) * 0.12;
+          spark.position.x = Math.cos(angle) * radius;
+          spark.position.y = Math.sin(angle * 1.35) * 1.2;
+          spark.position.z = Math.sin(angle * 2.2) * 0.8;
+          const sparkle = profile.sparkScale + ((index % 2 === 0 ? pulse : pulseFast) * profile.sparkPulse);
+          spark.scale.setScalar(0.55 * sparkle);
+          spark.material.color.lerp(accent, 0.08);
+          spark.material.opacity = 0.65;
+        });
+
+        renderer.render(scene, camera);
+      }
+
+      function disposeScene() {
+        if (animationFrameId) {
+          window.cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+
+        if (resizeObserver) {
+          resizeObserver.disconnect();
+          resizeObserver = null;
+        }
+
+        if (sceneObjects && Array.isArray(sceneObjects.disposables)) {
+          sceneObjects.disposables.forEach((item) => {
+            if (item && typeof item.dispose === 'function') {
+              item.dispose();
+            }
+          });
+        }
+
+        if (renderer) {
+          renderer.dispose();
+          if (renderer.domElement && renderer.domElement.parentNode) {
+            renderer.domElement.parentNode.removeChild(renderer.domElement);
+          }
+        }
+      }
+
+      function init() {
+        updateStats();
+        updateHistory();
+        attachEvents();
+        initThreeScene();
+        setGameState(GAME_STATES.IDLE);
+      }
+
+      window.addEventListener('beforeunload', () => {
+        clearPendingTimers();
+        disposeScene();
+      });
+
+      init();
+    })();
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reaction Forge | Three.js Reaction Timer</title>
+  <meta
+    name="description"
+    content="A polished reaction timer game built with vanilla JavaScript and Three.js. Test your response speed with animated 3D visuals, false-start detection, and live session statistics."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
       --bg: #0f172a;
       --surface: #1e293b;
       --surface-2: rgba(30, 41, 59, 0.75);
